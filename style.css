@@ -1,0 +1,33 @@
+* {
+	margin: 0;
+	padding: 0;
+	user-select: none;
+	-ms-user-select: none; 
+    -moz-user-select: none; 
+    -webkit-user-select: none;
+}
+
+.store {
+	text-align: center;
+	font-weight: bold;
+	font-size: 30px;
+	line-height: 42px;
+}
+
+.align-right {
+	text-align: right !important; 
+}
+.align-center {
+	text-align: center !important;
+}
+
+.hover {
+	background: #f8f9fe;
+	cursor: pointer;
+}
+
+.sum {
+	padding-top: 20px;
+	font-size: 20px;
+	font-weight: bold;
+}
