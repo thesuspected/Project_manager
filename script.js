@@ -22,9 +22,15 @@ webix.i18n.locales["ru-RU"].kanban = {
 	}
 };
 		
-
 webix.i18n.setLocale("ru-RU");
+
 // Массивы канбана
+var projects_data = [
+	{id:1, name:"Проект 1", group:"Группа 1", date:"none"},
+	{id:2, name:"Проект 1", group:"Группа 1", date:"none"},
+	{id:3, name:"Проект 1", group:"Группа 1", date:"none"},
+];
+
 var kanban_data = [
 	{ id:1, status:"new", text:"Task 1", tags:[1,2], comments:[{text:"Comment 1"}, {text:"Comment 2"}] },
 	{ id:2, status:"work", text:"Task 2", tags:[1], color:3, votes:1, personId: 4  },
@@ -95,16 +101,13 @@ var kanban = {
 
 var sidebar = {
 	view:"sidebar",
+	id:"sidebar",
 	collapsed:true,
+	width: 200,
 	data:[
-		{ id:"dashboard", icon:"mdi mdi-doctor" },
-		{ id:"cube", icon:"mdi mdi-cube" },
-		{ id:"code", icon:"mdi mdi-code-not-equal-variant" },
-		{ id:"layout", icon:"mdi mdi-view-dashboard" },
-		{ id:"charts", icon:"mdi mdi-chart-areaspline" },
-		{ id:"typo", icon:"mdi mdi-format-line-style" },
-		{ id:"calendar", icon:"mdi mdi-calendar" },
-		{ id:"files", icon:"mdi mdi-folder-star" },
+		{ id:"tasks", value:"Задачи", icon:"mdi mdi-calendar-check" },
+		{ id:"groups", value:"Группы", icon:"mdi mdi-account-group" },
+		{ id:"employees", value:"Сотрудники", icon:"mdi mdi-account-card-details" },
 	]
 };
 
@@ -112,17 +115,26 @@ var toolbar = {
 	view:"toolbar",
 	height:50,
 	elements:[
-		{ view:"icon", icon:"mdi mdi-menu" },
+		{ view:"icon", icon:"mdi mdi-menu", click: function(){$$("sidebar").toggle()} },
 		{},
+		{ view:"icon", icon:"mdi mdi-account-circle"},
 		{ view:"icon", icon:"mdi mdi-bell", badge:3 },
 		{ view:"icon", icon:"mdi mdi-settings" }
 	]
 }
 
+var projects = {
+	header:"Проекты",
+	body:{
+		view:"list",
+  		template:"#name# - #group#",
+  		select:true,
+  		data: projects_data
+	}
+}
+
 window.onload = function() {
 	webix.ready(function(){
-
-
 
 		//if (!webix.env.touch && webix.env.scrollSize)
     	//webix.CustomScroll.init();
@@ -144,9 +156,8 @@ window.onload = function() {
 									gravity:0.3,
 									type:"wide",
 									rows: [
-										{
-											template:"projects"
-										},
+										
+										projects,
 
 										{
 											template:"add project"
