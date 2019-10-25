@@ -81,15 +81,19 @@ var colors_set = [
 var kanban = {
 	view:"kanban",
 	type:"wide",
-    cols:[
-      { header:"Назначенные",
-       body:{ view:"kanbanlist", status:"new" }},
-      { header:"В работе",
-       body:{ view:"kanbanlist", status:"work" }},
-      { header:"Завершенные",
-       body:{ view:"kanbanlist", status:"done" }}
-    ],
-    editor:true,
+	cols:[
+	{ rows:[
+	    { view:"kanbanheader", label:"Backlog", link:"new" },
+	    { id:"new", view:"kanbanlist", status:"new" }
+    ]},
+	{ header:"Назначенные",
+	body:{ view:"kanbanlist", status:"new" }},
+	{ header:"В работе",
+	body:{ view:"kanbanlist", status:"work" }},
+	{ header:"Завершенные",
+	body:{ view:"kanbanlist", status:"done" }}
+	],
+	editor:true,
     userList:true, // позже настроить вывод должности
     cardActions:true,
     comments:{currentUser:9}, // задать пользователя текущей сессии
