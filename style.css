@@ -31,3 +31,38 @@
 	font-size: 20px;
 	font-weight: bold;
 }
+
+.listName {
+	float: left;
+	font-weight: 500;
+	padding-top: 6px;
+}
+
+.listDate {
+	float: right;
+	padding-top: 6px;
+}
+
+.listGroup {
+	float: left;
+	background: rgba(228, 230, 240, 0.8);
+    padding: 4px 8px;
+    border-radius: 12px;
+    margin: 0 8px 2px 0;
+    line-height: 14px;
+}
+
+.listIcon {
+	float:right;
+	line-height: 22px;
+	color: #94a1b3;
+    font-size: 16px;
+}
+
+.listIcon:hover {
+
+}
+
+.listBlock {
+	height: 40px; 	
+}

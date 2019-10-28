@@ -26,25 +26,25 @@ webix.i18n.setLocale("ru-RU");
 
 // Массивы канбана
 var projects_data = [
-	{id:1, name:"Проект 1", group:"Группа 1", date:"none"},
-	{id:2, name:"Проект 1", group:"Группа 1", date:"none"},
-	{id:3, name:"Проект 1", group:"Группа 1", date:"none"},
+	{id:1, name:"Webix", group:"Разработчики", date:"01.11.2019"},
+	{id:2, name:"Верстка проекта", group:"Frontend", date:"03.07.2019"},
+	{id:3, name:"Базы данных", group:"dbEngineers", date:"02.03.2019"},
 ];
 
 var kanban_data = [
-	{ id:1, status:"new", text:"Task 1", tags:[1,2], comments:[{text:"Comment 1"}, {text:"Comment 2"}] },
-	{ id:2, status:"work", text:"Task 2", tags:[1], color:3, votes:1, personId: 4  },
-	{ id:3, status:"work", text:"Task 3", tags:[2,4,5], comments:[{ id:6, user_id:4, date:"2018-06-14 23:01", text:"No worry, I am planning..."}], personId: 6 },
-	{ id:4, status:"work", text:"Task 4", tags:[3], votes:1, personId: 5  },
-	{ id:5, status:"work", text:"Task 5", tags:[3,4], votes:3  },
-	{ id:6, status:"work", text:"Task 6", tags:[4,5,6,7], comments:[{text:"Comment 1"}, {text:"Comment 2"}], personId: 2 },
-	{ id:7, status:"work", text:"Task 7", tags:[1], votes:2, personId: 7, image: "image001.png"  },
-	{ id:8, status:"work", text:"Task 8", tags:[7], comments:[{text:"Comment 1"}, {text:"Comment 2"}], votes:5, personId: 4  },
-	{ id:9, status:"work", text:"Task 9", tags:[6], votes:1, personId: 2},
-	{ id:10, status:"work", text:"Task 10", tags:[1], comments:[{text:"Comment 1"}, {text:"Comment 2"}, {text:"Comment 3"}], votes:10, personId:1 },
-	{ id:11, status:"work", text:"Task 11", tags:[2], votes:3, personId: 8 },
-	{ id:12, status:"done", text:"Task 12", votes:2 , personId: 8, image: "image002.png"},
-	{ id:13, status:"new", text:"Task 14",  personId: 8}
+	{ id:1, status:"Задачи", text:"Task 1", tags:[1,2] },
+	{ id:2, status:"В работе", text:"Task 2", tags:[1], color:3, votes:1, user_id: 4  },
+	{ id:3, status:"В работе", text:"Task 3", tags:[2,4,5], comments:[{ id:1, user_id:4, date:"2018-06-14 23:01", text:"No worry, I am planning..."}, { id:2, user_id:5, date:"2018-06-15 05:01", text:"your plan is dead"}], user_id: 6 },
+	{ id:4, status:"В работе", text:"Task 4", tags:[3], votes:1, user_id: 5  },
+	{ id:5, status:"В работе", text:"Task 5", tags:[3,4], votes:3  },
+	{ id:6, status:"Выполнено", text:"Task 6", tags:[4,5,6,7], user_id: 2 },
+	{ id:7, status:"На проверку", text:"Task 7", tags:[1], votes:2, user_id: 7, image: "image001.png"  },
+	{ id:8, status:"На проверку", text:"Task 8", tags:[7], votes:5, user_id: 4  },
+	{ id:9, status:"На проверку", text:"Task 9", tags:[6], votes:1, user_id: 2},
+	{ id:10, status:"На проверку", text:"Task 10", tags:[1], votes:10, user_id:1 },
+	{ id:11, status:"В работе", text:"Task 11", tags:[2], votes:3, user_id: 8 },
+	{ id:12, status:"Выполнено", text:"Task 12", votes:2 , user_id: 8, image: "image002.png"},
+	{ id:13, status:"Задачи", text:"Task 14",  user_id: 8}
 ];
 
 var imagePath = "https://docs.webix.com/samples/63_kanban/common/imgs/";
@@ -83,15 +83,15 @@ var kanban = {
 	type:"wide",
 	cols:[
 	{ rows:[
-	    { view:"kanbanheader", label:"Backlog", link:"new" },
-	    { id:"new", view:"kanbanlist", status:"new" }
+	    { view:"kanbanheader", label:"Задачи", link:"new" },
+	    { id:"new", view:"kanbanlist", status:"Задачи" }
     ]},
-	{ header:"Назначенные",
-	body:{ view:"kanbanlist", status:"new" }},
 	{ header:"В работе",
-	body:{ view:"kanbanlist", status:"work" }},
-	{ header:"Завершенные",
-	body:{ view:"kanbanlist", status:"done" }}
+	body:{ view:"kanbanlist", status:"В работе" }},
+	{ header:"На проверку",
+	body:{ view:"kanbanlist", status:"На проверку" }},
+	{ header:"Выполнено",
+	body:{ view:"kanbanlist", status:"Выполнено" }}
 	],
 	editor:true,
     userList:true, // позже настроить вывод должности
@@ -120,6 +120,7 @@ var toolbar = {
 	height:50,
 	elements:[
 		{ view:"icon", icon:"mdi mdi-menu", click: function(){$$("sidebar").toggle()} },
+		{ view:"label", label:"Project Manager"},
 		{},
 		{ view:"icon", icon:"mdi mdi-account-circle"},
 		{ view:"icon", icon:"mdi mdi-bell", badge:3 },
@@ -128,20 +129,36 @@ var toolbar = {
 }
 
 var projects = {
-	header:"Проекты",
-	body:{
+	rows:[
+	{
+		cols:[
+			{
+				template:"Проекты",
+				type:"header"
+			},
+			{
+				view:"icon",
+				icon:"mdi mdi-sort"
+			}
+		]
+	},
+	{
 		view:"list",
-  		template:"#name# - #group#",
+  		template:"<div class='listBlock'><div class='listName'>#id#. #name#</div> <div class='listDate'>#date#</div></div> <div class='listBlock'> <div class='listGroup'>#group#</div> <div class='listIcon webix_kanban_icon kbi-cogs '></div></div>",
+  		type: {
+  			height:80
+  		},
   		select:true,
   		data: projects_data
 	}
+	]
 }
 
 window.onload = function() {
 	webix.ready(function(){
 
-		//if (!webix.env.touch && webix.env.scrollSize)
-    	//webix.CustomScroll.init();
+		if (!webix.env.touch && webix.env.scrollSize)
+    	webix.CustomScroll.init();
 
 		webix.ui({
 			rows: [
@@ -160,12 +177,8 @@ window.onload = function() {
 									gravity:0.3,
 									type:"wide",
 									rows: [
-										
-										projects,
 
-										{
-											template:"add project"
-										}
+										projects
 									]
 								},
 								
