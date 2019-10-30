@@ -32,7 +32,7 @@ var projects_data = [
 ];
 
 var kanban_data = [
-	{ id:1, status:"Задачи", text:"Task 1", tags:[1,2] },
+	{ id:1, status:"Новые", text:"Task 1", tags:[1,2] },
 	{ id:2, status:"В работе", text:"Task 2", tags:[1], color:3, votes:1, user_id: 4  },
 	{ id:3, status:"В работе", text:"Task 3", tags:[2,4,5], comments:[{ id:1, user_id:4, date:"2018-06-14 23:01", text:"No worry, I am planning..."}, { id:2, user_id:5, date:"2018-06-15 05:01", text:"your plan is dead"}], user_id: 6 },
 	{ id:4, status:"В работе", text:"Task 4", tags:[3], votes:1, user_id: 5  },
@@ -44,7 +44,7 @@ var kanban_data = [
 	{ id:10, status:"На проверку", text:"Task 10", tags:[1], votes:10, user_id:1 },
 	{ id:11, status:"В работе", text:"Task 11", tags:[2], votes:3, user_id: 8 },
 	{ id:12, status:"Выполнено", text:"Task 12", votes:2 , user_id: 8, image: "image002.png"},
-	{ id:13, status:"Задачи", text:"Task 14",  user_id: 8}
+	{ id:13, status:"Новые", text:"Task 14",  user_id: 8}
 ];
 
 var imagePath = "https://docs.webix.com/samples/63_kanban/common/imgs/";
@@ -80,17 +80,25 @@ var colors_set = [
 // Виджеты
 var kanban = {
 	view:"kanban",
+	id:"kanban",
 	type:"wide",
 	cols:[
 	{ rows:[
-	    { view:"kanbanheader", label:"Задачи", link:"new" },
-	    { id:"new", view:"kanbanlist", status:"Задачи" }
+	    { 
+	    	view:"toolbar",
+			padding:{left:10},
+			elements:[
+				{view:"label", label:"Новые"},
+				{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("kanban").showEditor();}}
+			] 
+		},
+	    { id:"new", view:"kanbanlist", status:"Новые" }
     ]},
-	{ header:"В работе",
+	{ header:"<span class='webix_icon mdi mdi-briefcase-outline'></span>В работе",
 	body:{ view:"kanbanlist", status:"В работе" }},
-	{ header:"На проверку",
+	{ header:"<span class='webix_icon mdi mdi-alert-rhombus-outline'></span>На проверку",
 	body:{ view:"kanbanlist", status:"На проверку" }},
-	{ header:"Выполнено",
+	{ header:"<span class='webix_icon mdi mdi-check'></span>Выполнено",
 	body:{ view:"kanbanlist", status:"Выполнено" }}
 	],
 	editor:true,
@@ -126,24 +134,37 @@ var toolbar = {
 		{ view:"icon", icon:"mdi mdi-bell", badge:3 },
 		{ view:"icon", icon:"mdi mdi-settings" }
 	]
-}
+};
 
 var projects = {
 	rows:[
 	{
-		cols:[
-			{
-				template:"Проекты",
-				type:"header"
-			},
-			{
-				view:"icon",
-				icon:"mdi mdi-sort"
-			}
+		view:"toolbar",
+		padding:{left:10},
+		elements:[
+			{view:"label", label:"Проекты"},
+			{view:"icon", icon:"mdi mdi-sort", click: sortProject}
+			// {view:"menu",
+			// data:[
+			// 	{ view:"icon", icon:"mdi mdi-sort", value:"", submenu:[
+			// 	"По порядку",
+			// 	"По имени", 
+			// 	"По дате",
+			// 	]},
+			// ],  
+			// on:{
+			// 	onMenuItemClick:function(id){
+			// 		webix.message("Click: "+this.getMenuItem(id).value);     
+			// 	}
+			// },
+			// type:{
+			// 	subsign:true
+			// }}
 		]
 	},
 	{
 		view:"list",
+		id:"listProject",
   		template:"<div class='listBlock'><div class='listName'>#id#. #name#</div> <div class='listDate'>#date#</div></div> <div class='listBlock'> <div class='listGroup'>#group#</div> <div class='listIcon webix_kanban_icon kbi-cogs '></div></div>",
   		type: {
   			height:80
@@ -152,7 +173,11 @@ var projects = {
   		data: projects_data
 	}
 	]
-}
+};
+
+function sortProject() {
+	$$("listProject").sort("#name#");
+};
 
 window.onload = function() {
 	webix.ready(function(){
