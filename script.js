@@ -47,6 +47,12 @@ var kanban_data = [
 	{ id:13, status:"Новые", text:"Task 14",  user_id: 8}
 ];
 
+var sort_data = [
+	{id:"1", name:"По порядку", value:"id"},
+	{id:"2", name:"По имени", value:"name"},
+	{id:"3", name:"По дате", value:"date"}
+];
+
 var imagePath = "https://docs.webix.com/samples/63_kanban/common/imgs/";
 var users_set = [
   {id:1, value:"Rick Lopes", position:"Руководитель отдела", image:imagePath + "1.jpg"},
@@ -143,23 +149,7 @@ var projects = {
 		padding:{left:10},
 		elements:[
 			{view:"label", label:"Проекты"},
-			{view:"icon", icon:"mdi mdi-sort", click: sortProject}
-			// {view:"menu",
-			// data:[
-			// 	{ view:"icon", icon:"mdi mdi-sort", value:"", submenu:[
-			// 	"По порядку",
-			// 	"По имени", 
-			// 	"По дате",
-			// 	]},
-			// ],  
-			// on:{
-			// 	onMenuItemClick:function(id){
-			// 		webix.message("Click: "+this.getMenuItem(id).value);     
-			// 	}
-			// },
-			// type:{
-			// 	subsign:true
-			// }}
+			{view:"icon", icon:"mdi mdi-sort", popup:"sort_Popup"}
 		]
 	},
 	{
@@ -175,8 +165,8 @@ var projects = {
 	]
 };
 
-function sortProject() {
-	$$("listProject").sort("#name#");
+function sortProject(value) {
+	$$("listProject").sort("#" + value + "#");
 };
 
 window.onload = function() {
@@ -185,6 +175,7 @@ window.onload = function() {
 		if (!webix.env.touch && webix.env.scrollSize)
     	webix.CustomScroll.init();
 
+    	// Разметка
 		webix.ui({
 			rows: [
 
@@ -213,6 +204,27 @@ window.onload = function() {
 					]
 				}
 			]
+		});
+
+		// Сортировка проектов
+		webix.ui({
+			view:"popup",
+			id:"sort_Popup",
+			head:"Submenu",
+			width:150,
+			body:{
+				view:"list", 
+				data:sort_data,
+				template:"#name#",
+				autoheight:true,
+				select:true,
+				on:{
+					onSelectChange:function () {
+						let value = this.getSelectedItem().value;
+						sortProject(value);
+					}
+				}
+			}
 		});
 	});
 }
