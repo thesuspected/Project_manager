@@ -22,13 +22,13 @@ webix.i18n.locales["ru-RU"].kanban = {
 	}
 };
 		
-webix.i18n.setLocale("ru-RU");
+webix.i18n.setLocale('ru-RU');
 
 // Массивы канбана
 var projects_data = [
-	{id:1, name:"Webix", group:"Разработчики", date:"01.11.2019"},
-	{id:2, name:"Верстка проекта", group:"Frontend", date:"03.07.2019"},
-	{id:3, name:"Базы данных", group:"dbEngineers", date:"02.03.2019"},
+	{id:1, name:"Webix", group:"Разработчики", date:new Date(2019,8,14)},
+	{id:2, name:"Верстка проекта", group:"Frontend", date:new Date(2019,6,25)},
+	{id:3, name:"Базы данных", group:"dbEngineers", date:new Date(2019,5,1)},
 ];
 
 var kanban_data = [
@@ -77,10 +77,15 @@ var tags_set = [
 ];
 
 var colors_set = [
-	{id:1	, value:"Свободная", color:"green"},
+	{id:1, value:"Свободная", color:"green"},
 	{id:2, value:"На выполнении", color:"#1CA1C1"},
 	{id:3, value:"Важная", color:"orange"},
 	{id:4, value:"Срочная", color:"red"},
+];
+
+var projectGroup_data = [
+	{value:"Designers", id:1},
+	{value:"Developers", id:2}
 ];
 
 // Виджеты
@@ -149,13 +154,16 @@ var projects = {
 		padding:{left:10},
 		elements:[
 			{view:"label", label:"Проекты"},
+			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("project_window").show();}},
 			{view:"icon", icon:"mdi mdi-sort", popup:"sort_Popup"}
 		]
 	},
 	{
 		view:"list",
 		id:"listProject",
-  		template:"<div class='listBlock'><div class='listName'>#id#. #name#</div> <div class='listDate'>#date#</div></div> <div class='listBlock'> <div class='listGroup'>#group#</div> <div class='listIcon webix_kanban_icon kbi-cogs '></div></div>",
+  		template:function(obj){ 
+			return "<div class='listBlock'><div class='listName'>" + obj.id + ". " + obj.name + "</div> <div class='listDate'>" + webix.i18n.dateFormatStr(obj.date) + "</div></div> <div class='listBlock'> <div class='listGroup'>" + obj.group + "</div> <div class='listIcon webix_kanban_icon kbi-cogs '></div></div>"
+		},
   		type: {
   			height:80
   		},
@@ -164,6 +172,18 @@ var projects = {
 	}
 	]
 };
+
+var projectForm = [
+  { view:"text", label:"Название", labelPosition:"top"},
+  { cols: [
+  	{ view:"datepicker", value: new Date(), label: "Дата", labelPosition:"top" },
+  	{ view:"select", margin:20, label:"Пр. группа", options:projectGroup_data, labelPosition:"top"}
+  	]},
+  { margin:5, cols:[
+    { view:"button", value:"Сохранить", css:"webix_primary" },
+    { view:"button", value:"Отмена" }
+  ]}
+];
 
 function sortProject(value) {
 	$$("listProject").sort("#" + value + "#");
@@ -210,7 +230,6 @@ window.onload = function() {
 		webix.ui({
 			view:"popup",
 			id:"sort_Popup",
-			head:"Submenu",
 			width:150,
 			body:{
 				view:"list", 
@@ -225,6 +244,19 @@ window.onload = function() {
 					}
 				}
 			}
+		});
+
+		// Добавление проекта
+		webix.ui({
+			view:"window", 
+			id:"project_window",
+			width:400,
+			move:true,
+			position:"center", 
+			head:"Добавить проект",
+			close:true,
+			modal:true,  
+			body:{ view:"form", elements:projectForm }
 		});
 	});
 }
