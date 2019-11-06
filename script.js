@@ -26,9 +26,15 @@ webix.i18n.setLocale('ru-RU');
 
 // Массивы канбана
 var projects_data = [
-	{id:1, name:"Webix", group:"Разработчики", date:new Date(2019,8,14)},
-	{id:2, name:"Верстка проекта", group:"Frontend", date:new Date(2019,6,25)},
-	{id:3, name:"Базы данных", group:"dbEngineers", date:new Date(2019,5,1)},
+	{name:"Webix", date:new Date(2019,8,14), group:"Developers", id:1},
+	{name:"Верстка проекта", date:new Date(2019,6,25), group:"Designers", id:2},
+	{name:"Базы данных", date:new Date(2019,5,1), group:"dbEngineers", id:3},
+];
+
+var projectPopup_data = [
+	{id:"1", name:"Редактировать", value:"edit"},
+	{id:"2", name:"Копировать", value:"copy"},
+	{id:"3", name:"Удалить", value:"delete"}
 ];
 
 var kanban_data = [
@@ -84,8 +90,9 @@ var colors_set = [
 ];
 
 var projectGroup_data = [
-	{value:"Designers", id:1},
-	{value:"Developers", id:2}
+	{value:"Designers"},
+	{value:"Developers"},
+	{value:"dbEngineers"}
 ];
 
 // Виджеты
@@ -168,26 +175,63 @@ var projects = {
   			height:80
   		},
   		select:true,
+  		onClick:{ 
+        	"listIcon":function(node){
+            	$$("project_Popup").show(node); 
+        	}
+    	},
   		data: projects_data
 	}
 	]
 };
 
-var projectForm = [
-  { view:"text", label:"Название", labelPosition:"top"},
-  { cols: [
-  	{ view:"datepicker", value: new Date(), label: "Дата", labelPosition:"top" },
-  	{ view:"select", margin:20, label:"Пр. группа", options:projectGroup_data, labelPosition:"top"}
+var projectForm = {
+	view:"form",
+	id:"project_Form",
+	elements:[
+  	{ view:"text", label:"Название", labelPosition:"top", name:"name"},
+  	{ cols: [
+  		{ view:"datepicker", value: new Date(), label: "Дата", labelPosition:"top", name:"date" },
+  		{ view:"select", margin:20, label:"Пр. группа", options:projectGroup_data, labelPosition:"top", name:"group"}
   	]},
-  { margin:5, cols:[
-    { view:"button", value:"Сохранить", css:"webix_primary" },
-    { view:"button", value:"Отмена" }
-  ]}
-];
+  	{ margin:5, cols:[
+  		{ view:"button", value:"Отмена", click: function(){$$("project_window").hide(); $$("project_Form").setValues(originalValues);}},
+  		{},
+    	{ view:"button", value:"Сохранить", css:"webix_primary", click:addProject },
+  	]}
+	]
+};
 
 function sortProject(value) {
 	$$("listProject").sort("#" + value + "#");
 };
+
+function editProject() {
+	var projectValues = $$("listProject").getSelectedItem();
+	$$("project_Form").setValues(projectValues);
+	$$("project_window").show();
+}
+
+function addProject() {
+	var item_data = $$("project_Form").getValues();
+
+	let findIt = projects_data.find(itemFind => itemFind.id == item_data.id);
+	if(findIt) {
+		var id = $$("listProject").getSelectedId();
+		projects_data[id - 1] = item_data;
+		// не перерисовывает
+		$$("listProject").updateItem();
+	} else {
+		item_data.id = projects_data.length + 1;
+		projects_data[projects_data.length] = Object.assign({}, item_data);
+  		$$("listProject").add(item_data);
+	}
+
+  	$$("project_window").hide();
+  	$$("project_Form").setValues(originalValues);
+};
+var originalValues = {name:"", date:new Date(), group:"Designers"};
+
 
 window.onload = function() {
 	webix.ready(function(){
@@ -246,6 +290,35 @@ window.onload = function() {
 			}
 		});
 
+		// Попап проектов
+		webix.ui({
+			view:"popup",
+			id:"project_Popup",
+			width:150,
+			body:{
+				view:"list", 
+				id:"projectPopup_List",
+				data:projectPopup_data,
+				template:"#name#",
+				autoheight:true,
+				select:true,
+				on:{
+					onItemClick:function (id) {
+						let value = this.getItem(id).value;
+						switch(value) {
+							case "edit":
+								editProject();
+								break;
+							case "copy":
+								break;
+							case "delete":
+								break;
+						}
+					}
+				}
+			}
+		});
+
 		// Добавление проекта
 		webix.ui({
 			view:"window", 
@@ -256,7 +329,7 @@ window.onload = function() {
 			head:"Добавить проект",
 			close:true,
 			modal:true,  
-			body:{ view:"form", elements:projectForm }
+			body:projectForm
 		});
 	});
 }
