@@ -32,9 +32,8 @@ var projects_data = [
 ];
 
 var projectPopup_data = [
-	{id:"1", name:"Редактировать", value:"edit"},
-	{id:"2", name:"Копировать", value:"copy"},
-	{id:"3", name:"Удалить", value:"delete"}
+	{id:1, name:"Редактировать", value:"edit"},
+	{id:2, name:"Удалить", value:"delete"}
 ];
 
 var kanban_data = [
@@ -161,7 +160,7 @@ var projects = {
 		padding:{left:10},
 		elements:[
 			{view:"label", label:"Проекты"},
-			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("project_window").show();}},
+			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("project_Form").setValues(originalValues); $$("project_window").show();}},
 			{view:"icon", icon:"mdi mdi-sort", popup:"sort_Popup"}
 		]
 	},
@@ -188,6 +187,9 @@ var projects = {
 var projectForm = {
 	view:"form",
 	id:"project_Form",
+	rules:{
+        "name":webix.rules.isNotEmpty
+    },
 	elements:[
   	{ view:"text", label:"Название", labelPosition:"top", name:"name"},
   	{ cols: [
@@ -195,7 +197,7 @@ var projectForm = {
   		{ view:"select", margin:20, label:"Пр. группа", options:projectGroup_data, labelPosition:"top", name:"group"}
   	]},
   	{ margin:5, cols:[
-  		{ view:"button", value:"Отмена", click: function(){$$("project_window").hide(); $$("project_Form").setValues(originalValues);}},
+  		{ view:"button", value:"Отмена", click: function(){$$("project_Popup").hide(); $$("project_window").hide(); $$("project_Form").setValues(originalValues);}},
   		{},
     	{ view:"button", value:"Сохранить", css:"webix_primary", click:addProject },
   	]}
@@ -208,30 +210,69 @@ function sortProject(value) {
 
 function editProject() {
 	var projectValues = $$("listProject").getSelectedItem();
+	// заносим значения элемента в форму для изменения
 	$$("project_Form").setValues(projectValues);
 	$$("project_window").show();
 }
 
+function deleteProject() {
+	var projectValues = $$("listProject").getSelectedItem();
+	// подтверждение удаления
+	webix.confirm({
+		  ok:"ОК", cancel:"Отмена",
+		  text:"Вы собираетесь удалить проект, вы уверены?"
+	})
+		.then(function(){
+			var id = $$("listProject").getSelectedId();
+			// удаляем элемент в массиве
+			projects_data.splice(id - 1, 1);
+			// удаляем элемент на странице
+			$$("listProject").remove(id);
+			// проходим по оставшимся элементам, после удаленного
+			for (var i = id - 1; i < projects_data.length; i++) {
+				// изменяем id след. элементов
+				projects_data[i].id -= 1;
+				// удаляем оставшиеся элементы на странице
+				$$("listProject").remove(i + 2);
+				// обновляем их с новым id
+				$$("listProject").add(projects_data[i]);
+			}
+			$$("project_Popup").hide();
+	  	})
+	    .fail(function(){
+	    	$$("project_Popup").hide();
+	    });
+}
+
 function addProject() {
-	var item_data = $$("project_Form").getValues();
-
-	let findIt = projects_data.find(itemFind => itemFind.id == item_data.id);
-	if(findIt) {
-		var id = $$("listProject").getSelectedId();
-		projects_data[id - 1] = item_data;
-		// не перерисовывает
-		$$("listProject").updateItem();
-	} else {
-		item_data.id = projects_data.length + 1;
-		projects_data[projects_data.length] = Object.assign({}, item_data);
-  		$$("listProject").add(item_data);
-	}
-
-  	$$("project_window").hide();
-  	$$("project_Form").setValues(originalValues);
+	// валидация заполнения имени проекта
+	if ($$("project_Form").validate()) {
+		// берем значения элемента
+		var item_data = $$("project_Form").getValues();
+		// поиск выбранного элемента в массиве
+		let findIt = projects_data.find(itemFind => itemFind.id == item_data.id);
+		if(findIt) {
+			// изменение существующего
+			var id = $$("listProject").getSelectedId();
+			projects_data[id - 1] = item_data;
+			$$("listProject").remove(id);
+			$$("listProject").add(item_data, id-1);
+			$$("listProject").updateItem();
+		} else {
+			// добавление нового элемента
+			item_data.id = projects_data.length + 1;
+			projects_data[projects_data.length] = Object.assign({}, item_data);
+	  		$$("listProject").add(item_data);
+		}
+		// скрываем окна, возвращаем ст. значения форме
+		$$("project_Popup").hide();
+	  	$$("project_window").hide();
+	  	$$("project_Form").setValues(originalValues);
+	} else
+		webix.message({ type:"error", text:"Дайте название проекту" });
 };
+// ст. значения формы
 var originalValues = {name:"", date:new Date(), group:"Designers"};
-
 
 window.onload = function() {
 	webix.ready(function(){
@@ -309,9 +350,8 @@ window.onload = function() {
 							case "edit":
 								editProject();
 								break;
-							case "copy":
-								break;
 							case "delete":
+								deleteProject();
 								break;
 						}
 					}
@@ -330,6 +370,15 @@ window.onload = function() {
 			close:true,
 			modal:true,  
 			body:projectForm
+		});
+
+		$$("listProject").attachEvent("onItemClick", function(){
+
+		});
+		// редактирование проекта по 2-му клику
+		$$("listProject").attachEvent("onItemDblClick", function(){
+			var projectValues = $$("listProject").getSelectedItem();
+		  	editProject(projectValues);
 		});
 	});
 }
