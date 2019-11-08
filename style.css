@@ -66,3 +66,26 @@
 .listBlock {
 	height: 40px; 	
 }
+
+.listImg {
+	border-radius: 50px;
+	float: left;
+	width: 48px;
+	height: 48px;
+	margin: 10px 10px 10px 5px;
+}
+
+.listPos {
+	float: left;
+	line-height: 10px;
+	color: #475466;
+}
+
+.pad {
+	padding-top: 
+}
+
+.listGroupIcon {
+	float: left;
+	padding-right: 5px;
+}

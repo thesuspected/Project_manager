@@ -65,7 +65,7 @@ var users_set = [
   {id:3, value:"Douglass Moore", position:"Менеджер", image:imagePath + "3.jpg"},
   {id:4, value:"Eric Doe", position:"Ведущий проекта", image:imagePath + "4.jpg"},
   {id:5, value:"Sophi Elliman", position:"Секретарь", image:imagePath + "5.jpg"},
-  {id:6, value:"Anna O'Neal", position:"Аналитик"},
+  {id:6, value:"Anna O'Neal", position:"Аналитик", image:imagePath + "6.jpg"},
   {id:7, value:"Marcus Storm", position:"Тестировщик", image:imagePath + "7.jpg"},
   {id:8, value:"Nick Branson", position:"Дизайнер", image:imagePath + "8.jpg"},
   {id:9, value:"CC", image:imagePath + "9.jpg"}
@@ -133,10 +133,16 @@ var sidebar = {
 	id:"sidebar",
 	collapsed:true,
 	width: 200,
+	on:{
+		onItemClick(id){
+			console.log(id);
+			location.href = id + ".html";
+		}
+	},
 	data:[
 		{ id:"tasks", value:"Задачи", icon:"mdi mdi-calendar-check" },
 		{ id:"groups", value:"Группы", icon:"mdi mdi-account-group" },
-		{ id:"employees", value:"Сотрудники", icon:"mdi mdi-account-card-details" },
+		//{ id:"employees", value:"Сотрудники", icon:"mdi mdi-account-card-details" },
 	]
 };
 
@@ -168,7 +174,7 @@ var projects = {
 		view:"list",
 		id:"listProject",
   		template:function(obj){ 
-			return "<div class='listBlock'><div class='listName'>" + obj.id + ". " + obj.name + "</div> <div class='listDate'>" + webix.i18n.dateFormatStr(obj.date) + "</div></div> <div class='listBlock'> <div class='listGroup'>" + obj.group + "</div> <div class='listIcon webix_kanban_icon kbi-cogs '></div></div>"
+			return "<div class='listBlock'><div class='listName'>" + obj.id + ". " + obj.name + "</div> <div class='listDate'>" + webix.i18n.dateFormatStr(obj.date) + "</div></div> <div class='listBlock'> <div class='listGroup'><div class='listGroupIcon mdi mdi-account-group'></div>" + obj.group + "</div> <div class='listIcon webix_kanban_icon kbi-cogs '></div></div>"
 		},
   		type: {
   			height:80
