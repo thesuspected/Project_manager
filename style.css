@@ -89,3 +89,8 @@
 	float: left;
 	padding-right: 5px;
 }
+
+.icon {
+	height: 30px;
+	padding: 9px;
+}

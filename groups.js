@@ -26,8 +26,9 @@ var table_data = [
 var sidebar = {
 	view:"sidebar",
 	id:"sidebar",
+	activeTitle:false,
 	collapsed:true,
-	width: 200,
+	width: 150,
 	on:{
 		onItemClick(id){
 			console.log(id);
@@ -46,6 +47,7 @@ var toolbar = {
 	height:50,
 	elements:[
 		{ view:"icon", icon:"mdi mdi-menu", click: function(){$$("sidebar").toggle()} },
+		{ view:"template", type:"clean", template:"<img src='./img/list.svg' class='icon'>", width:40},
 		{ view:"label", label:"Project Manager"},
 		{},
 		{ view:"icon", icon:"mdi mdi-account-circle"},
@@ -59,6 +61,7 @@ var groups = {
 	{
 		view:"toolbar",
 		padding:{left:10},
+		margin:-4,
 		elements:[
 			{view:"label", label:"Группы"},
 			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("project_Form").setValues(originalValues); $$("project_window").show();}},
@@ -91,10 +94,13 @@ var employees = {
 	{
 		view:"toolbar",
 		padding:{left:10},
+		margin:-4,
 		elements:[
 			{view:"label", label:"Сотрудники"},
 			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("project_Form").setValues(originalValues); $$("project_window").show();}},
-			{view:"icon", icon:"mdi mdi-sort", popup:"sort_Popup"}
+			{view:"text", placeholder:"поиск...", id:"search", hidden:true},
+			{view:"icon", id:"openIcon", icon:"mdi mdi-magnify", click:openSearch},
+			{view:"icon", id:"closeIcon", icon:"mdi mdi-close", hidden:true, click:closeSearch}
 		]
 	},
 	{
@@ -118,32 +124,44 @@ var employees = {
 };
 
 let groups_table = {
-			view:"datatable",
-			id:"groupsTable",
-			columns:[
-				{ id:"id",	header:[ {text:"Stock", colspan:4, css:"align-center", borderless: true}, {text:"№", css:"align-right"} ], css:"align-right" },
-				{ id:"name", header:[ "", "Товар" ], fillspace:true },
-				{ id:"price", header:[ "", {text:"Цена", css:"align-center" } ], css:"align-center" },
-				{ id:"amount", header:[ "", {text:"Кол-во", css:"align-center" } ], css:"align-center" },
-			],
-			on:{
-				onItemClick(){ 
-					let item = this.getSelectedItem();
-					let sign = true;
-					calcSum(item, sign);
-					addGood(item);
-					$$("grid_basket").refresh();
-					$$("grid_stock").refresh();
-				}
-			},
+	view:"datatable",
+	id:"groupsTable",
+	columns:[
+		{ id:"id",	header:[ {text:"Stock", colspan:4, css:"align-center", borderless: true}, {text:"№", css:"align-right"} ], css:"align-right" },
+		{ id:"name", header:[ "", "Товар" ], fillspace:true },
+		{ id:"price", header:[ "", {text:"Цена", css:"align-center" } ], css:"align-center" },
+		{ id:"amount", header:[ "", {text:"Кол-во", css:"align-center" } ], css:"align-center" },
+	],
+	on:{
+		onItemClick(){ 
+			let item = this.getSelectedItem();
+			let sign = true;
+			calcSum(item, sign);
+			addGood(item);
+			$$("grid_basket").refresh();
+			$$("grid_stock").refresh();
+		}
+	},
 
-			hover: "hover",
-			scroll:false,
-			autoheight:true,
-			select: true,
-			data:table_data
-			
-		};
+	hover: "hover",
+	scroll:false,
+	autoheight:true,
+	select: true,
+	data:table_data
+	
+};
+
+function openSearch() {
+	$$("search").show();
+	$$("closeIcon").show();
+	$$("openIcon").hide();
+};
+
+function closeSearch() {
+	$$("search").hide();
+	$$("openIcon").show();
+	$$("closeIcon").hide();
+};
 
 window.onload = function() {
 	webix.ready(function(){
@@ -188,6 +206,17 @@ window.onload = function() {
 					]
 				}
 			]
+		});
+		// подсветка вкладки
+		$$("sidebar").select("groups", true);
+		// Поиск сотрудников
+		$$("search").attachEvent("onTimedKeyPress",function(){ 
+			var value = this.getValue().toLowerCase(); 
+			
+			$$("listEmployees").filter(function(obj){ 
+				//return obj.value.toLowerCase().indexOf(value)==0; Начинается с букв
+				return obj.value.toLowerCase().indexOf(value)!=-1; // Имеются буквы
+			})
 		});
 	});
 }
