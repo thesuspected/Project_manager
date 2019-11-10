@@ -121,40 +121,46 @@ var kanban = {
 	body:{ view:"kanbanlist", status:"Выполнено" }}
 	],
 	// окно задачи
-	editor:[
-      { view:"textarea", name:"text", height:90, label:"Текст" },
-      {
-        view:"multicombo", name:"tags", label:"Метки",
-        options:tags_set
-      },
-      {
-      	margin:10,
-        cols:[
-          {
-            name:"user_id", view:"combo", options:users_set, label:"Назначить"
-          },
-          {
-            view:"richselect", name:"color", label:"Приоритет",
-            options:{
-              body:{
-                data:colors_set,
-                css:"webix_kanban_colorpicker",
-                template:"<span class='webix_kanban_color_item' style='background-color: #color#'></span>#value#"
-              }
-            }
-          },
-          {
-            view:"richselect", name:"$list", label:"Статус",
-            options:[
-              {id:"0",value:"Новые"},
-              {id:"1",value:"В работе"},
-              {id:"2",value:"На проверку"},
-              {id:"3",value:"Выполнено"}
-            ]
-          }
-        ]
-      }
-    ],
+	editor:{
+		elements:[
+			{ view:"textarea", name:"text", height:90, label:"Текст" },
+			{
+				view:"multicombo", name:"tags", label:"Метки",
+				options:tags_set
+			},
+			{
+				margin:10,
+				cols:[
+					{
+						name:"user_id", view:"combo", options:users_set, label:"Назначить"
+					},
+					{
+						view:"richselect", name:"color", label:"Приоритет",
+						options:{
+							body:{
+								data:colors_set,
+								css:"webix_kanban_colorpicker",
+								template:"<span class='webix_kanban_color_item' style='background-color: #color#'></span>#value#"
+							}
+						}
+					},
+					{
+						view:"richselect", name:"$list", label:"Статус",
+						options:[
+							{id:"0",value:"Новые"},
+							{id:"1",value:"В работе"},
+							{id:"2",value:"На проверку"},
+							{id:"3",value:"Выполнено"}
+						]
+					}
+				]
+			}
+		],
+		rules:{
+            text: webix.rules.isNotEmpty,
+            user_id: webix.rules.isNotEmpty
+        }
+	},
     userList:true, // настроить вывод должности?
     cardActions:true,
     comments:{currentUser:9}, // задать пользователя текущей сессии
@@ -204,7 +210,7 @@ var projects = {
 		margin:-4,
 		elements:[
 			{view:"label", label:"Проекты"},
-			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("titleP").setValue("Добавить проект"); $$("project_Form").setValues(originalValues); $$("project_window").show();}},
+			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("titleP").setValue("Добавить проект"); $$("dltProjectBtn").hide(); $$("project_Form").setValues(originalValues); $$("project_window").show();}},
 			{view:"icon", icon:"mdi mdi-sort", popup:"sort_Popup"}
 		]
 	},
@@ -242,9 +248,9 @@ var projectForm = {
   		{ view:"select", margin:20, label:"Пр. группа", options:projectGroup_data, labelPosition:"top", name:"group"}
   	]},
   	{ margin:10, cols:[
-  		{ view:"button", value:"Удалить", click:deleteProject },
+  		{ view:"button", id:"dltProjectBtn", width:111, value:"Удалить", click:deleteProject },
   		{},
-    	{ view:"button", value:"Сохранить", css:"webix_primary", click:addProject },
+    	{ view:"button", value:"Сохранить", width:111, css:"webix_primary", click:addProject },
   	]}
 	]
 };
@@ -322,6 +328,7 @@ function sortProject(value) {
 
 function editProject() {
 	$$("titleP").setValue("Изменить проект");
+	$$("dltProjectBtn").show();
 	$$("project_Popup").hide();
 	var projectValues = $$("listProject").getSelectedItem();
 	// заносим значения элемента в форму для изменения
@@ -437,7 +444,16 @@ window.onload = function() {
 		$$("listProject").attachEvent("onItemDblClick", function(){
 			var projectValues = $$("listProject").getSelectedItem();
 			$$("titleP").setValue("Изменить проект");
+			$$("dltProjectBtn").show();
 		  	editProject(projectValues);
+		});
+		// валидация задачи
+		$$("kanban").attachEvent("onBeforeEditorAction", function(action, editor, obj){
+			if (action === "save" && !editor.getForm().validate())
+				return false;
+		});
+		$$("kanban").getEditor().attachEvent("onHide", function(){
+			this.getForm().clearValidation();
 		});
 	});
 }
