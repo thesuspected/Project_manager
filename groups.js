@@ -19,8 +19,26 @@ var users_set = [
   {id:9, value:"CC", position:"Верстальщик", image:imagePath + "9.jpg"}
 ];
 
+var positions = [
+	{value:"Руководитель отдела"},
+	{value:"Junior programmist"},
+	{value:"Менеджер"},
+	{value:"Ведущий проекта"},
+	{value:"Секретарь"},
+	{value:"Аналитик"},
+	{value:"Тестировщик"},
+	{value:"Дизайнер"},
+	{value:"Верстальщик"}
+]
+
 var table_data = [
 	{},
+];
+
+var projectGroup_data = [
+	{value:"Designers"},
+	{value:"Developers"},
+	{value:"dbEngineers"}
 ];
 
 var sidebar = {
@@ -97,7 +115,7 @@ var employees = {
 		margin:-4,
 		elements:[
 			{view:"label", label:"Сотрудники"},
-			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("project_Form").setValues(originalValues); $$("project_window").show();}},
+			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("employees_Form").setValues(originalValues); $$("employees_window").show();}},
 			{view:"text", placeholder:"поиск...", id:"search", hidden:true},
 			{view:"icon", id:"openIcon", icon:"mdi mdi-magnify", click:openSearch},
 			{view:"icon", id:"closeIcon", icon:"mdi mdi-close", hidden:true, click:closeSearch}
@@ -106,6 +124,7 @@ var employees = {
 	{
 		view:"list",
 		id:"listEmployees",
+		css:"listEmployees",
   		template:function(obj){ 
 			return "<img class='listImg pad' src='" + obj.image + "'></img><div class='listBlock'><div class='listName pad'>" + obj.value + "</div></div> <div class='listBlock'> <div class='listPos pad'>" + obj.position + "</div></div>"
 		},
@@ -122,6 +141,7 @@ var employees = {
 	}
 	]
 };
+var originalValues = {name:"", date:new Date(), group:"Designers"};
 
 let groups_table = {
 	view:"datatable",
@@ -151,6 +171,67 @@ let groups_table = {
 	
 };
 
+// форма заполнения проекта
+var employeesForm = {
+	view:"form",
+	id:"employees_Form",
+	rules:{
+        "name":webix.rules.isNotEmpty
+    },
+	elements:[
+		// фото + фио, должность
+		{
+			margin:10,
+			cols:[
+				{
+					template:"Фото"
+				},
+				{
+					rows:[
+						{ view:"text", label:"ФИО", labelPosition:"top", name:"name" },
+						{ view:"datepicker", value: new Date(), label: "Дата", labelPosition:"top", name:"date" }
+						
+					]
+				}
+			]
+		},
+		{
+			margin:10,
+			cols: [
+				{ view:"select", label:"Группа", options:projectGroup_data, labelPosition:"top", name:"group" },
+		  		{ view:"select", label:"Должность", options:positions, labelPosition:"top", name:"position" }
+		  	]
+		},
+		{
+			margin:10,
+			cols:[
+		  		{ view:"button", id:"dltProjectBtn", width:111, value:"Уволить", click:deleteEmployees },
+		  		{},
+		    	{ view:"button", value:"Нанять", width:111, css:"webix_primary", click:addEmployees },
+		  	]
+		}
+	]
+};
+// окно проекта
+var employeesWindow = webix.ui({
+	view:"window", 
+	id:"employees_window",
+	width:400,
+	move:true,
+	position:"center", 
+	head:{
+		view:"toolbar", padding:{left:17}, margin:-4, cols:[
+			{ view:"label", id:"titleP", label: "Нанять сотрудника" },
+			{ view:"icon", icon:"mdi mdi-close", click:function(){ 
+				$$('project_window').hide();
+			}}
+		]
+	},
+	close:true,
+	modal:true,  
+	body:employeesForm
+});
+
 function openSearch() {
 	$$("search").show();
 	$$("closeIcon").show();
@@ -161,6 +242,14 @@ function closeSearch() {
 	$$("search").hide();
 	$$("openIcon").show();
 	$$("closeIcon").hide();
+};
+
+function deleteEmployees() {
+
+};
+
+function addEmployees() {
+
 };
 
 window.onload = function() {
