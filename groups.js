@@ -1,22 +1,23 @@
 webix.i18n.setLocale('ru-RU');
 
 var groups_data = [
-	{date:new Date(2019,8,14), group:"Developers", lead:"Rick Lopes", id:1},
-	{date:new Date(2019,6,25), group:"Designers", lead:"Sophi Elliman", id:2},
-	{date:new Date(2019,5,1), group:"dbEngineers", lead:"Marcus Storm", id:3},
+	{date:new Date(2019,3,1), group:"Не назначенные", lead:"", id:1},
+	{date:new Date(2019,5,24), group:"Developers", lead:"Rick Lopes", id:2},
+	{date:new Date(2019,6,25), group:"Designers", lead:"Sophi Elliman", id:3},
+	{date:new Date(2019,8,1), group:"dbEngineers", lead:"Marcus Storm", id:4},
 ];
 
 var imagePath = "https://docs.webix.com/samples/63_kanban/common/imgs/";
 var users_set = [
-  {id:1, value:"Rick Lopes", position:"Руководитель отдела", image:imagePath + "1.jpg"},
-  {id:2, value:"Martin Farrell", position:"Junior programmist", image:imagePath + "2.jpg"},
-  {id:3, value:"Douglass Moore", position:"Менеджер", image:imagePath + "3.jpg"},
-  {id:4, value:"Eric Doe", position:"Ведущий проекта", image:imagePath + "4.jpg"},
-  {id:5, value:"Sophi Elliman", position:"Секретарь", image:imagePath + "5.jpg"},
-  {id:6, value:"Anna O'Neal", position:"Аналитик", image:imagePath + "6.jpg"},
-  {id:7, value:"Marcus Storm", position:"Тестировщик", image:imagePath + "7.jpg"},
-  {id:8, value:"Nick Branson", position:"Дизайнер", image:imagePath + "8.jpg"},
-  {id:9, value:"CC", position:"Верстальщик", image:imagePath + "9.jpg"}
+  {id:1, value:"Rick Lopes", position:"Руководитель отдела", image:imagePath + "1.jpg", date:new Date(2019,3,1), mail:"exampleemail@gmail.com"},
+  {id:2, value:"Martin Farrell", position:"Junior programmist", image:imagePath + "2.jpg", date:new Date(2019,3,1), mail:"exampleemail@gmail.com"},
+  {id:3, value:"Douglass Moore", position:"Менеджер", image:imagePath + "3.jpg", date:new Date(2019,3,1), mail:"exampleemail@gmail.com"},
+  {id:4, value:"Eric Doe", position:"Ведущий проекта", image:imagePath + "4.jpg", date:new Date(2019,3,1), mail:"exampleemail@gmail.com"},
+  {id:5, value:"Sophi Elliman", position:"Секретарь", image:imagePath + "5.jpg", date:new Date(2019,3,1), mail:"exampleemail@gmail.com"},
+  {id:6, value:"Anna O'Neal", position:"Аналитик", image:imagePath + "6.jpg", date:new Date(2019,3,1), mail:"exampleemail@gmail.com"},
+  {id:7, value:"Marcus Storm", position:"Тестировщик", image:imagePath + "7.jpg", date:new Date(2019,3,1), mail:"exampleemail@gmail.com"},
+  {id:8, value:"Nick Branson", position:"Дизайнер", image:imagePath + "8.jpg", date:new Date(2019,3,1), mail:"exampleemail@gmail.com"},
+  {id:9, value:"CC", position:"Верстальщик", image:imagePath + "9.jpg", date:new Date(2019,3,1), mail:"exampleemail@gmail.com"}
 ];
 
 var positions = [
@@ -114,7 +115,7 @@ var employees = {
 		padding:{left:10},
 		margin:-4,
 		elements:[
-			{view:"label", label:"Сотрудники"},
+			{view:"label", label:"Все сотрудники"},
 			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("employees_Form").setValues(originalValues); $$("employees_window").show();}},
 			{view:"text", placeholder:"поиск...", id:"search", hidden:true},
 			{view:"icon", id:"openIcon", icon:"mdi mdi-magnify", click:openSearch},
@@ -147,27 +148,15 @@ let groups_table = {
 	view:"datatable",
 	id:"groupsTable",
 	columns:[
-		{ id:"id",	header:[ {text:"Stock", colspan:4, css:"align-center", borderless: true}, {text:"№", css:"align-right"} ], css:"align-right" },
-		{ id:"name", header:[ "", "Товар" ], fillspace:true },
-		{ id:"price", header:[ "", {text:"Цена", css:"align-center" } ], css:"align-center" },
-		{ id:"amount", header:[ "", {text:"Кол-во", css:"align-center" } ], css:"align-center" },
+		{ id:"id", header:"№", width:40},
+		{ id:"image", header:"Фото", width: 50},
+		{ id:"value", header:"ФИО", fillspace:true},
+		{ id:"position", header:"Должность", width: 200},
+		{ id:"date", header:"Дата рождения", width: 100},
+		{ id:"mail", header:"Почта", width: 200},
 	],
-	on:{
-		onItemClick(){ 
-			let item = this.getSelectedItem();
-			let sign = true;
-			calcSum(item, sign);
-			addGood(item);
-			$$("grid_basket").refresh();
-			$$("grid_stock").refresh();
-		}
-	},
-
-	hover: "hover",
-	scroll:false,
-	autoheight:true,
 	select: true,
-	data:table_data
+	data:users_set
 	
 };
 
@@ -284,9 +273,7 @@ window.onload = function() {
 								{
 									type:"wide",
 									cols:[
-										{
-											template:"group data"
-										},
+										groups_table,
 										employees
 									]
 								},
