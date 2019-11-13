@@ -108,7 +108,7 @@ var groups = {
 };
 
 var employees = {
-	gravity:0.35,
+	gravity:0.37,
 	rows:[
 	{
 		view:"toolbar",
@@ -148,11 +148,11 @@ let groups_table = {
 	view:"datatable",
 	id:"groupsTable",
 	columns:[
-		{ id:"id", header:"№", width:40},
-		{ id:"image", header:"Фото", width: 50},
+		{ id:"id", header:"№",  width:30},
+		{ id:"image", header:"<div class='dataIcon mdi mdi-account-circle'></div>", template:"<img src='#image#' class='dataImg'></img>", width: 50},
 		{ id:"value", header:"ФИО", fillspace:true},
-		{ id:"position", header:"Должность", width: 200},
-		{ id:"date", header:"Дата рождения", width: 100},
+		{ id:"position", header:"Должность", width: 160},
+		{ id:"date", header:"Дата рождения", template:function(obj){return "<div class='listDate'>" + webix.i18n.dateFormatStr(obj.date) + "</div>"}, width: 100},
 		{ id:"mail", header:"Почта", width: 200},
 	],
 	select: true,
