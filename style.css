@@ -75,6 +75,19 @@
 	margin: 9px 15px 10px 5px;
 }
 
+.dataImg {
+	border-radius: 50px;
+	width: 30px;
+	height: 30px;
+	margin: 3px;
+}
+
+.dataIcon {
+	line-height: 42px;
+    font-size: 20px;
+    padding-left: 8px;
+}
+
 .listPos {
 	float: left;
 	line-height: 10px;
