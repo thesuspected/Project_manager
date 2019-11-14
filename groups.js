@@ -1,10 +1,10 @@
 webix.i18n.setLocale('ru-RU');
 
 var groups_data = [
-	{date:new Date(2019,3,1), group:"Не назначенные", lead:"", id:1},
-	{date:new Date(2019,5,24), group:"Developers", lead:"Rick Lopes", id:2},
-	{date:new Date(2019,6,25), group:"Designers", lead:"Sophi Elliman", id:3},
-	{date:new Date(2019,8,1), group:"dbEngineers", lead:"Marcus Storm", id:4},
+	{date:new Date(2019,3,1), name:"Не назначенные", lead:"", id:1},
+	{date:new Date(2019,5,24), name:"Developers", lead:"Rick Lopes", id:2},
+	{date:new Date(2019,6,25), name:"Designers", lead:"Sophi Elliman", id:3},
+	{date:new Date(2019,8,1), name:"dbEngineers", lead:"Marcus Storm", id:4},
 ];
 
 var imagePath = "https://docs.webix.com/samples/63_kanban/common/imgs/";
@@ -40,6 +40,12 @@ var projectGroup_data = [
 	{value:"Designers"},
 	{value:"Developers"},
 	{value:"dbEngineers"}
+];
+
+var sort_data = [
+	{id:"1", name:"По порядку", value:"id"},
+	{id:"2", name:"По имени", value:"name"},
+	{id:"3", name:"По дате", value:"date"}
 ];
 
 var sidebar = {
@@ -83,7 +89,7 @@ var groups = {
 		margin:-4,
 		elements:[
 			{view:"label", label:"Группы"},
-			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("project_Form").setValues(originalValues); $$("project_window").show();}},
+			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => { $$("groups_window").show();}},
 			{view:"icon", icon:"mdi mdi-sort", popup:"sort_Popup"}
 		]
 	},
@@ -91,7 +97,7 @@ var groups = {
 		view:"list",
 		id:"listGroup",
   		template:function(obj){ 
-			return "<div class='listBlock'><div class='listName'>" + obj.id + ". " + obj.group + "</div> <div class='listDate'>" + webix.i18n.dateFormatStr(obj.date) + "</div></div> <div class='listBlock'> <div class='listGroup'><div class='listGroupIcon mdi mdi-human-greeting'></div>" + obj.lead + "</div> <div class='listIcon webix_kanban_icon kbi-cogs '></div></div>"
+			return "<div class='listBlock'><div class='listName'>" + obj.id + ". " + obj.name + "</div> <div class='listDate'>" + webix.i18n.dateFormatStr(obj.date) + "</div></div> <div class='listBlock'> <div class='listGroup'><div class='listGroupIcon mdi mdi-human-greeting'></div>" + obj.lead + "</div> <div class='listIcon webix_kanban_icon kbi-cogs '></div></div>"
 		},
   		type: {
   			height:80
@@ -152,13 +158,56 @@ let groups_table = {
 		{ id:"image", header:"<div class='dataIcon mdi mdi-account-circle'></div>", template:"<img src='#image#' class='dataImg'></img>", width: 50},
 		{ id:"value", header:"ФИО", fillspace:true},
 		{ id:"position", header:"Должность", width: 160},
-		{ id:"date", header:"Дата рождения", template:function(obj){return "<div class='listDate'>" + webix.i18n.dateFormatStr(obj.date) + "</div>"}, width: 100},
+		{ id:"date", header:"Дата рождения", template:function(obj){return "<div>" + webix.i18n.dateFormatStr(obj.date) + "</div>"}, width: 100},
 		{ id:"mail", header:"Почта", width: 200},
 	],
 	select: true,
 	data:users_set
-	
 };
+
+// форма заполнения группы
+var groupsForm = {
+	view:"form",
+	id:"groups_Form",
+	rules:{
+        "name":webix.rules.isNotEmpty
+    },
+	elements:[
+  	{ view:"text", label:"Название", labelPosition:"top", name:"name"},
+  	{ margin:10, cols: [
+  		{ view:"datepicker", value: new Date(), label: "Дата", labelPosition:"top", name:"date" },
+  		{ view:"select", margin:20, label:"Руководитель", options:users_set, labelPosition:"top", name:"lead"}
+  	]},
+  	{
+  		view:"multicombo", name:"tags", label:"Сотрудники", labelPosition:"top",
+		options:users_set
+  	},
+  	{ margin:10, cols:[
+  		{ view:"button", id:"dltProjectBtn", width:111, value:"Удалить", click:deleteGroup },
+  		{},
+    	{ view:"button", value:"Сохранить", width:111, css:"webix_primary", click:addGroup },
+  	]}
+	]
+};
+// окно групп
+var groupsWindow = webix.ui({
+	view:"window", 
+	id:"groups_window",
+	width:500,
+	move:true,
+	position:"center", 
+	head:{
+		view:"toolbar", padding:{left:17}, margin:-4, cols:[
+			{ view:"label", id:"titleG", label:"Добавить группу" },
+			{ view:"icon", icon:"mdi mdi-close", click:function(){ 
+				$$('groups_window').hide();
+			}}
+		]
+	},
+	close:true,
+	modal:true,  
+	body:groupsForm
+});
 
 // форма заполнения проекта
 var employeesForm = {
@@ -212,7 +261,7 @@ var employeesWindow = webix.ui({
 		view:"toolbar", padding:{left:17}, margin:-4, cols:[
 			{ view:"label", id:"titleP", label: "Нанять сотрудника" },
 			{ view:"icon", icon:"mdi mdi-close", click:function(){ 
-				$$('project_window').hide();
+				$$('employees_window').hide();
 			}}
 		]
 	},
@@ -220,6 +269,32 @@ var employeesWindow = webix.ui({
 	modal:true,  
 	body:employeesForm
 });
+
+// попап сортировки
+var sortPopup = webix.ui({
+	view:"popup",
+	id:"sort_Popup",
+	width:150,
+	body:{
+		view:"list", 
+		data:sort_data,
+		template:"#name#",
+		autoheight:true,
+		select:true,
+		on:{
+			onSelectChange:function () {
+				let value = this.getSelectedItem().value;
+				sortProject(value);
+			}
+		}
+	}
+});
+
+// Функции
+
+function sortProject(value) {
+	$$("listGroup").sort("#" + value + "#");
+};
 
 function openSearch() {
 	$$("search").show();
@@ -238,6 +313,14 @@ function deleteEmployees() {
 };
 
 function addEmployees() {
+
+};
+
+function deleteGroup() {
+
+};
+
+function addGroup() {
 
 };
 
