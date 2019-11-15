@@ -163,7 +163,7 @@ var kanban = {
 	},
     userList:true, // настроить вывод должности?
     cardActions:true,
-    comments:{currentUser:9}, // задать пользователя текущей сессии
+    //comments:{currentUser:9}, // задать пользователя текущей сессии
     tags: tags_set,
     users: users_set,
     colors: colors_set,
@@ -191,7 +191,6 @@ var sidebar = {
 	width: 150,
 	on:{
 		onItemClick(id){
-			console.log(id);
 			location.href = id + ".html";
 		}
 	},
