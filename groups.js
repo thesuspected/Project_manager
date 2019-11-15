@@ -122,7 +122,7 @@ var employees = {
 		margin:-4,
 		elements:[
 			{view:"label", label:"Все сотрудники"},
-			{view:"icon", icon:"mdi mdi-plus-circle-outline", click: () => {$$("employees_Form").setValues(originalValues); $$("employees_window").show();}},
+			{view:"icon", id:"employees", icon:"mdi mdi-plus-circle-outline", click: showWindow},
 			{view:"text", placeholder:"поиск...", id:"search", hidden:true},
 			{view:"icon", id:"openIcon", icon:"mdi mdi-magnify", click:openSearch},
 			{view:"icon", id:"closeIcon", icon:"mdi mdi-close", hidden:true, click:closeSearch}
@@ -148,7 +148,7 @@ var employees = {
 	}
 	]
 };
-var originalValues = {name:"", date:new Date(), group:"Designers"};
+var employees_originalValues = {name:"", date:new Date(), group:"Designers"};
 
 let groups_table = {
 	view:"datatable",
@@ -307,6 +307,11 @@ function closeSearch() {
 	$$("openIcon").show();
 	$$("closeIcon").hide();
 };
+
+function showWindow(id) {
+	$$(id + "_Form").setValues(eval(id + "_originalValues"));
+	$$(id + "_window").show();
+}
 
 function deleteEmployees() {
 
